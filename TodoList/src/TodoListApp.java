@@ -22,6 +22,7 @@ public class TodoListApp {
     private DefaultTableModel tableModel;
     private JTable table;
     private JTextField inputField;
+    private static final Path FILE_PATH = Paths.get("todolist.txt");
 
     public TodoListApp() {
         // メインウィンドウの設定
@@ -82,6 +83,8 @@ public class TodoListApp {
         frame.add(scrollPane, BorderLayout.CENTER);
         frame.add(bottomPanel, BorderLayout.SOUTH);
 
+        //ファイルをロードする
+        loadFromFile();
         // ウィンドウのサイズと表示設定
         frame.setSize(400, 300);
         frame.setVisible(true);
@@ -90,7 +93,6 @@ public class TodoListApp {
     // ファイルへの保存処理
     private void saveToFile() {
         try {
-            Path path = Paths.get("C:\\Users\\seiyo\\todolist.txt");
             int rowCount = tableModel.getRowCount();
             
             // テーブルのデータをリストに変換
@@ -100,10 +102,22 @@ public class TodoListApp {
             }
 
             // リストの内容をファイルに書き込む
-            Files.write(path, todoList);
+            Files.write(FILE_PATH , todoList);
         } catch (Exception e) {
             // エラーメッセージを表示
             JOptionPane.showMessageDialog(frame, "Error saving file: " + e.getMessage());
+        }
+    }
+    private void loadFromFile() {
+        if (Files.exists(FILE_PATH)) {
+            try {
+                List<String> todoList = Files.readAllLines(FILE_PATH);
+                for (String todo : todoList) {
+                    tableModel.addRow(new Object[]{todo});
+                }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(frame, "Error loading file: " + e.getMessage());
+            }
         }
     }
 
